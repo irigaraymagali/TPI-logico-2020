@@ -10,10 +10,10 @@ rol(lisa, detective).
 rol(rafa, detective).
 
 % Acciones:
-% atacarPersona(PersonaAtacada).
-% salvarPersona(Medico,PersonaSalvada).
-% investigarPersona(Detective, Persona).
-% eliminarPersona(PersonaEliminada).
+% atacarPersona(persona atacada).
+% salvarPersona(medico,persona salvada).
+% investigarPersona(detective, persona).
+% eliminarPersona(persona eliminada).
 
 % ronda (num de ronda, accion)
 ronda(1,atacarPersona(lisa)).
@@ -45,7 +45,7 @@ ronda(5,eliminarPersona(bart)).
 
 ronda(6,atacarPersona(burns)).
 
-%Parte b
+% Parte b
 perdieronLaRonda(Persona,Ronda) :-
     ronda(Ronda,eliminarPersona(Persona)).
 
@@ -53,7 +53,7 @@ perdieronLaRonda(Persona,Ronda) :-
     ronda(Ronda,atacarPersona(Persona)),
     not(ronda(Ronda,salvarPersona(_,Persona))).
 
-%            Explicar qué conceptos permiten resolver este requerimiento sin la necesidad de armar listas.
+% Explicar qué conceptos permiten resolver este requerimiento sin la necesidad de armar listas.
 
 
 % %Caso de prueba
@@ -76,15 +76,15 @@ test(jugadores_que_pierden_la_ronda,set(Persona==[bart,lisa])) :-
 % % Punto 2
 % Parte a
 
-contrincantes(Persona,Contrincante) :-
-    rol(Persona,mafia),
-    not(rol(Contrincante,mafia)).
+% contrincantes(Persona,Contrincante) :-
+%     rol(Persona,mafia),
+%     not(rol(Contrincante,mafia)).
 
 contrincantes(Persona,Contrincante) :-
     not(rol(Persona,mafia)),
     rol(Contrincante,mafia).
 
-%       Esta relación debe ser simétrica.
+% Esta relación debe ser simétrica.
 
 % Parte b
 
@@ -94,3 +94,22 @@ contrincantes(Persona,Contrincante) :-
 gano(Persona) :-
     not(perdieronLaRonda(Persona,_)),
     forall(contrincantes(Persona,Contrincante),perdieronLaRonda(Contrincante,_)).
+
+
+
+% Los contrincantes de tony (por ser de la mafia) son homero, burns, nick, hibbert, lisa y rafa.
+% Los contrincantes de homero (por no ser de la mafia) son bart, tony y maggie.
+% La única ganadora es maggie.
+
+% %Caso de prueba
+:- begin_tests(jugadores_contrincantes).
+test(contrincantes_de_la_mafia,set(Contrincante==[homero,burns,nick,hibbert,lisa,rafa])) :- 
+    contrincantes(tony,Contrincante).
+test(contrincantes_del_otro_bando,set(Contrincante==[bart,tony,maggie])) :- 
+    contrincantes(homero,Contrincante).
+:- end_tests(jugadores_contrincantes).
+
+:- begin_tests(jugadores_ganadores).
+test(maggie_es_la_unica_ganadora,nondet) :- 
+    gano(maggie).
+:- end_tests(jugadores_ganadores).
