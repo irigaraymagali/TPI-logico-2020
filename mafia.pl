@@ -76,9 +76,9 @@ test(jugadores_que_pierden_la_ronda,set(Persona==[bart,lisa])) :-
 % % Punto 2
 % Parte a
 
-% contrincantes(Persona,Contrincante) :-
-%     rol(Persona,mafia),
-%     not(rol(Contrincante,mafia)).
+contrincantes(Persona,Contrincante) :-
+    rol(Persona,mafia),
+    not(rol(Contrincante,mafia)).
 
 contrincantes(Persona,Contrincante) :-
     not(rol(Persona,mafia)),
@@ -94,12 +94,6 @@ contrincantes(Persona,Contrincante) :-
 gano(Persona) :-
     not(perdieronLaRonda(Persona,_)),
     forall(contrincantes(Persona,Contrincante),perdieronLaRonda(Contrincante,_)).
-
-
-
-% Los contrincantes de tony (por ser de la mafia) son homero, burns, nick, hibbert, lisa y rafa.
-% Los contrincantes de homero (por no ser de la mafia) son bart, tony y maggie.
-% La única ganadora es maggie.
 
 % %Caso de prueba
 :- begin_tests(jugadores_contrincantes).
