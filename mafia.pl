@@ -10,10 +10,10 @@ rol(lisa, detective).
 rol(rafa, detective).
 
 % Acciones:
-atacarPersona(PersonaAtacada).
-salvarPersona(Medico,PersonaSalvada).
-investigarPersona(Detective, Persona).
-eliminarPersona(PersonaEliminada).
+% atacarPersona(PersonaAtacada).
+% salvarPersona(Medico,PersonaSalvada).
+% investigarPersona(Detective, Persona).
+% eliminarPersona(PersonaEliminada).
 
 % ronda (num de ronda, accion)
 ronda(1,atacarPersona(lisa)).
@@ -45,7 +45,7 @@ ronda(5,eliminarPersona(bart)).
 
 ronda(6,atacarPersona(burns)).
 
-%Parte B
+%Parte b
 perdieronLaRonda(Persona,Ronda) :-
     ronda(Ronda,eliminarPersona(Persona)).
 
@@ -53,7 +53,7 @@ perdieronLaRonda(Persona,Ronda) :-
     ronda(Ronda,atacarPersona(Persona)),
     not(ronda(Ronda,salvarPersona(_,Persona))).
 
-% Explicar qué conceptos permiten resolver este requerimiento sin la necesidad de armar listas.
+%            Explicar qué conceptos permiten resolver este requerimiento sin la necesidad de armar listas.
 
 
 % %Caso de prueba
@@ -73,3 +73,24 @@ test(jugadores_que_pierden_la_ronda,set(Persona==[bart,lisa])) :-
 :- end_tests(perdieron_la_ronda).
 
 
+% % Punto 2
+% Parte a
+
+contrincantes(Persona,Contrincante) :-
+    rol(Persona,mafia),
+    not(rol(Contrincante,mafia)).
+
+contrincantes(Persona,Contrincante) :-
+    not(rol(Persona,mafia)),
+    rol(Contrincante,mafia).
+
+%       Esta relación debe ser simétrica.
+
+% Parte b
+
+% Saber si alguien ganó, y en el caso que haya varios ganadores, conocerlos todos.   ( Que sea inversible????? )
+% Explicar cómo se relaciona el concepto de inversibilidad con la solución.
+
+gano(Persona) :-
+    not(perdieronLaRonda(Persona,_)),
+    forall(contrincantes(Persona,Contrincante),perdieronLaRonda(Contrincante,_)).
