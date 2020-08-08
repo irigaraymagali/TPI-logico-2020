@@ -84,6 +84,13 @@ contrincantes(Persona,Contrincante) :-
     not(rol(Persona,mafia)),
     rol(Contrincante,mafia).
 
+% contrincantes(bando(_,mafia),otro).
+% contrincantes(bando(_,otro),mafia).
+% bando(Persona,mafia) :-
+%   rol(Persona,mafia). 
+% bando(Persona,otro) :-
+%     not(rol(Persona,mafia)). 
+
 % Esta relación debe ser simétrica.
 
 % Parte b
