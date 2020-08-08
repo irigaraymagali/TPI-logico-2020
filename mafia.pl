@@ -45,18 +45,18 @@ ronda(5,eliminarPersona(bart)).
 
 ronda(6,atacarPersona(burns)).
 
-% Parte b
+% PARTE B
 perdieronLaRonda(Persona,Ronda) :-
     ronda(Ronda,eliminarPersona(Persona)).
 
 perdieronLaRonda(Persona,Ronda) :-
     ronda(Ronda,atacarPersona(Persona)),
-    not(ronda(Ronda,salvarPersona(_,Persona))).
+  %  rol(PersonaQueSalva,medico),  ¿va?
+    not(ronda(Ronda,salvarPersona(PersonaQueSalva,Persona))).
 
 % Explicar qué conceptos permiten resolver este requerimiento sin la necesidad de armar listas.
 
-
-% %Caso de prueba
+% Caso de prueba
 :- begin_tests(perdieron_la_ronda).
 test(jugador_eliminado_pierde_esa_ronda,nondet) :- 
     perdieronLaRonda(nick,1).
@@ -73,9 +73,10 @@ test(jugadores_que_pierden_la_ronda,set(Persona==[bart,lisa])) :-
 :- end_tests(perdieron_la_ronda).
 
 
-% % Punto 2
-% Parte a
+%  PUNTO 2
 
+% PARTE A
+% Esta relación debe ser simétrica.
 contrincantes(Persona,Contrincante) :-
     rol(Persona,mafia),
     not(rol(Contrincante,mafia)).
@@ -91,18 +92,16 @@ contrincantes(Persona,Contrincante) :-
 % bando(Persona,otro) :-
 %     not(rol(Persona,mafia)). 
 
-% Esta relación debe ser simétrica.
 
-% Parte b
 
-% Saber si alguien ganó, y en el caso que haya varios ganadores, conocerlos todos.   ( Que sea inversible????? )
-% Explicar cómo se relaciona el concepto de inversibilidad con la solución.
-
-gano(Persona) :-
+% PARTE B
+   gano(Persona) :-
     not(perdieronLaRonda(Persona,_)),
     forall(contrincantes(Persona,Contrincante),perdieronLaRonda(Contrincante,_)).
 
-% %Caso de prueba
+% Explicar cómo se relaciona el concepto de inversibilidad con la solución.      (NO es iversible asi)
+
+% Caso de prueba
 :- begin_tests(jugadores_contrincantes).
 test(contrincantes_de_la_mafia,set(Contrincante==[homero,burns,nick,hibbert,lisa,rafa])) :- 
     contrincantes(tony,Contrincante).
@@ -114,3 +113,46 @@ test(contrincantes_del_otro_bando,set(Contrincante==[bart,tony,maggie])) :-
 test(maggie_es_la_unica_ganadora,nondet) :- 
     gano(maggie).
 :- end_tests(jugadores_ganadores).
+
+
+
+
+% PUNTO 4
+
+% PARTE A
+siguenEnJuego(Persona,RondaNueva) :- 
+    not(perdieronLaRonda(Persona,RondaAnterior)), 
+     RondaAnterior < RondaNueva.      
+         
+% Caso de prueba
+:- begin_tests(jugadores_siguen_en_juego).
+test(jugador_sigue_jugando_aunque_pierda_despues,nondet) :- 
+    siguenEnJuego(rafa,2).
+test(jugador_que_perdio_antes_no_sigue_jugando,fail) :- 
+    siguenEnJuego(nick,4).
+test(jugadores_que_llegan_a_la_ultima_ronda,set(Jugadores==[maggie,burns])) :- 
+    siguenEnJuego(Jugadores,6).
+%Todas las personas en juego juegan la primera ronda.
+:- end_tests(jugadores_siguen_en_juego).
+
+
+% PARTE B
+% Una ronda es interesante si en dicha ronda siguen más de 7 personas en juego.
+rondaInteresante(Ronda) :-
+    findall(Persona,not(perdieronLaRonda(Persona,Ronda)), PersonasQueSiguen),
+    length(PersonasQueSiguen, Cantidad),
+    Cantidad > 7.
+    
+% También es interesante cuando quedan en juego menos o igual cantidad de personas que la cantidad inicial de la mafia.
+
+% Caso de prueba
+:- begin_tests(rondas_interesantes).
+test(ronda_con_mucha_gente_es_interesante,nondet) :- 
+    rondaInteresante(1).
+% La última ronda es interesante porque quedan pocas personas.
+test(ronda_con_7_personas_en_juego_no_es_interesante,fail) :-
+    rondaInteresante(3).
+test(rodas_interesantes,set(Rondas==[1,2,6])) :-
+    rondaInteresante(Rondas).
+:- end_tests(rondas_interesantes).
+
