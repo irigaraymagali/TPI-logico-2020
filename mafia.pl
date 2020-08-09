@@ -11,7 +11,7 @@ rol(rafa, detective).
 
 % Acciones:
 % atacarPersona(persona atacada).
-% salvarPersona(medico,persona salvada).
+% salvarPersona(medico, persona salvada).
 % investigarPersona(detective, persona).
 % eliminarPersona(persona eliminada).
 
@@ -90,10 +90,11 @@ bandoContrario(Contrincante,Rol) :-
 
 % PARTE B
    gano(Persona) :-
+    rol(Persona,_),
     not(perdieronLaRonda(Persona,_)),
     forall(contrincantes(Persona,Contrincante),perdieronLaRonda(Contrincante,_)).
 
-% Explicar cómo se relaciona el concepto de inversibilidad con la solución.      (NO es iversible asi)
+% Explicar cómo se relaciona el concepto de inversibilidad con la solución.    ES inversible pq puedo hacer consultas existenciales.......
 
 % Caso de prueba
 :- begin_tests(jugadores_contrincantes).
@@ -113,10 +114,16 @@ test(maggie_es_la_unica_ganadora,nondet) :-
 
 % PUNTO 4
 
-% PARTE A
+% PARTE A     
+siguenEnJuego(Persona,1) :-
+    rol(Persona,_).
+
 siguenEnJuego(Persona,RondaNueva) :- 
-    not(perdieronLaRonda(Persona,RondaAnterior)), 
-    RondaAnterior < RondaNueva.     
+    rol(Persona,_),
+    RondaNueva > 1,
+    RondaAnterior is RondaNueva - 1,
+    not(perdieronLaRonda(Persona,RondaAnterior)),
+    siguenEnJuego(Persona,RondaAnterior).
          
 % Caso de prueba
 :- begin_tests(jugadores_siguen_en_juego).
@@ -126,28 +133,35 @@ test(jugador_que_perdio_antes_no_sigue_jugando,fail) :-
     siguenEnJuego(nick,4).
 test(jugadores_que_llegan_a_la_ultima_ronda,set(Jugadores==[maggie,burns])) :- 
     siguenEnJuego(Jugadores,6).
-%Todas las personas en juego juegan la primera ronda.     poner todos asi??
 test(todos_los_jugadores_juegan_la_primer_ronda,set(Jugadores==[maggie,burns,homero,bart,tony,nick,hibbert,lisa,rafa])) :- 
     siguenEnJuego(Jugadores,1).
 :- end_tests(jugadores_siguen_en_juego).
 
 % PARTE B
-% Una ronda es interesante si en dicha ronda siguen más de 7 personas en juego.
 rondaInteresante(Ronda) :-
-    findall(Persona,siguenEnJuego(Persona,Ronda), PersonasQueSiguen),
-    length(PersonasQueSiguen, Cantidad),
+    ronda(Ronda,_),
+    cantidadPersonasQueSiguen(Ronda,Cantidad),
     Cantidad > 7.
-    
-% También es interesante cuando quedan en juego menos o igual cantidad de personas que la cantidad inicial de la mafia.
 
-% Caso de prueba
+rondaInteresante(Ronda) :-
+    ronda(Ronda,_),
+    cantidadPersonasQueSiguen(Ronda,Cantidad),
+    findall(Persona,rol(Persona,mafia),Mafiosos),
+    length(Mafiosos, CantidadInicialMafia),
+    Cantidad =< CantidadInicialMafia.
+
+cantidadPersonasQueSiguen(Ronda,Cantidad) :-
+    findall(Persona,siguenEnJuego(Persona,Ronda), PersonasQueSiguen),
+    length(PersonasQueSiguen, Cantidad).
+    
+
+% Caso de prueba.
 :- begin_tests(rondas_interesantes).
 test(ronda_con_mucha_gente_es_interesante,nondet) :- 
     rondaInteresante(1).
-% La última ronda es interesante porque quedan pocas personas.
 test(ronda_con_7_personas_en_juego_no_es_interesante,fail) :-
     rondaInteresante(3).
-test(rodas_interesantes,set(Rondas==[1,2,6])) :-
+test(todas_las_rondas_interesantes,set(Rondas==[1,2,6])) :-
     rondaInteresante(Rondas).
 :- end_tests(rondas_interesantes).
 
