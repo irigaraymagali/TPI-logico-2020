@@ -51,8 +51,7 @@ perdieronLaRonda(Persona,Ronda) :-
 
 perdieronLaRonda(Persona,Ronda) :-
     ronda(Ronda,atacarPersona(Persona)),
-  %  rol(PersonaQueSalva,medico),  ¿va?
-    not(ronda(Ronda,salvarPersona(PersonaQueSalva,Persona))).
+    not(ronda(Ronda,salvarPersona(_,Persona))).
 
 % Explicar qué conceptos permiten resolver este requerimiento sin la necesidad de armar listas.
 
@@ -76,23 +75,18 @@ test(jugadores_que_pierden_la_ronda,set(Persona==[bart,lisa])) :-
 %  PUNTO 2
 
 % PARTE A
-% Esta relación debe ser simétrica.
 contrincantes(Persona,Contrincante) :-
-    rol(Persona,mafia),
-    not(rol(Contrincante,mafia)).
+    rol(Persona,Rol),
+    bandoContrario(Contrincante,Rol).
+    
+%bandoContrario(personaContrincante,RolPersona)
+bandoContrario(Persona,mafia) :-
+    rol(Persona,Rol),
+    Rol\=mafia.
 
-contrincantes(Persona,Contrincante) :-
-    not(rol(Persona,mafia)),
-    rol(Contrincante,mafia).
-
-% contrincantes(bando(_,mafia),otro).
-% contrincantes(bando(_,otro),mafia).
-% bando(Persona,mafia) :-
-%   rol(Persona,mafia). 
-% bando(Persona,otro) :-
-%     not(rol(Persona,mafia)). 
-
-
+bandoContrario(Persona,Rol) :-
+    Rol\= mafia,
+    rol(Persona,mafia).
 
 % PARTE B
    gano(Persona) :-
@@ -122,7 +116,7 @@ test(maggie_es_la_unica_ganadora,nondet) :-
 % PARTE A
 siguenEnJuego(Persona,RondaNueva) :- 
     not(perdieronLaRonda(Persona,RondaAnterior)), 
-     RondaAnterior < RondaNueva.      
+    RondaAnterior < RondaNueva.     
          
 % Caso de prueba
 :- begin_tests(jugadores_siguen_en_juego).
@@ -139,7 +133,7 @@ test(jugadores_que_llegan_a_la_ultima_ronda,set(Jugadores==[maggie,burns])) :-
 % PARTE B
 % Una ronda es interesante si en dicha ronda siguen más de 7 personas en juego.
 rondaInteresante(Ronda) :-
-    findall(Persona,not(perdieronLaRonda(Persona,Ronda)), PersonasQueSiguen),
+    findall(Persona,siguenEnJuego(Persona,Ronda), PersonasQueSiguen),
     length(PersonasQueSiguen, Cantidad),
     Cantidad > 7.
     
@@ -156,3 +150,23 @@ test(rodas_interesantes,set(Rondas==[1,2,6])) :-
     rondaInteresante(Rondas).
 :- end_tests(rondas_interesantes).
 
+
+
+% PUNTO 5
+
+
+
+
+
+
+
+
+
+
+
+% PARTE A
+
+% Conocer los jugadores profesionales, que son aquellos que le hicieron algo a todos sus contrincantes, 
+% o sea que las acciones de las que el profesional es responsable terminaron afectando a todos sus contrincantes.
+
+%jugadorProfesional(Persona) :-
