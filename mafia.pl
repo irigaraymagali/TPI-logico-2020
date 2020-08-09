@@ -151,23 +151,37 @@ test(rodas_interesantes,set(Rondas==[1,2,6])) :-
     rondaInteresante(Rondas).
 :- end_tests(rondas_interesantes).
 
-
-
 % PUNTO 5
 
+% PARTE A 
+
+jugadorProfesional(Persona) :- 
+contrincantes(Persona,Contrincante),
+forall(accionResponsable(Persona,Accion), accionAfectada(Contrincante,Accion)).
+
+accionResponsable(Persona,atacarPersona) :-
+     rol(Persona,mafia).
+accionResponsable(Persona,salvarPersona) :-
+    rol(Persona,medico),
+    ronda(_,salvarPersona(_,Persona)).
+accionResponsable(Persona,investigarPersona) :-
+    rol(Persona,detective),
+    ronda(_,investigarPersona(Persona,_)).
+accionResponsable(Persona,eliminarPersona) :-
+    ronda(_,eliminarPersona(PersonaEliminada)),
+    contrincantes(PersonaEliminada,Persona).
+
+accionAfectada(Persona,atacarPersona) :-
+    ronda(_,atacarPersona(Persona)).
+accionAfectada(Persona,salvarPersona) :-
+    ronda(_,salvarPersona(_,Persona)).
+accionAfectada(Persona,investigarPersona) :-
+    ronda(_,investigarPersona(_,Persona)).
+accionAfectada(Persona,eliminarPersona) :-
+    ronda(_,eliminaroPersona(Persona)).
 
 
 
 
 
 
-
-
-
-
-% PARTE A
-
-% Conocer los jugadores profesionales, que son aquellos que le hicieron algo a todos sus contrincantes, 
-% o sea que las acciones de las que el profesional es responsable terminaron afectando a todos sus contrincantes.
-
-%jugadorProfesional(Persona) :-
