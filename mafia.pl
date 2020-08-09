@@ -94,7 +94,8 @@ bandoContrario(Contrincante,Rol) :-
     not(perdieronLaRonda(Persona,_)),
     forall(contrincantes(Persona,Contrincante),perdieronLaRonda(Contrincante,_)).
 
-% Explicar cómo se relaciona el concepto de inversibilidad con la solución.    ES inversible pq puedo hacer consultas existenciales.......
+% Explicar cómo se relaciona el concepto de inversibilidad con la solución.    
+%
 
 % Caso de prueba
 :- begin_tests(jugadores_contrincantes).
@@ -154,7 +155,6 @@ cantidadPersonasQueSiguen(Ronda,Cantidad) :-
     findall(Persona,siguenEnJuego(Persona,Ronda), PersonasQueSiguen),
     length(PersonasQueSiguen, Cantidad).
     
-
 % Caso de prueba.
 :- begin_tests(rondas_interesantes).
 test(ronda_con_mucha_gente_es_interesante,nondet) :- 
@@ -168,7 +168,6 @@ test(todas_las_rondas_interesantes,set(Rondas==[1,2,6])) :-
 % PUNTO 5
 
 % PARTE A 
-
 jugadorProfesional(Persona) :- 
 contrincantes(Persona,Contrincante),
 forall(accionResponsable(Persona,Accion), accionAfectada(Contrincante,Accion)).
