@@ -79,14 +79,14 @@ contrincantes(Persona,Contrincante) :-
     rol(Persona,Rol),
     bandoContrario(Contrincante,Rol).
     
-%bandoContrario(personaContrincante,RolPersona)
-bandoContrario(Persona,mafia) :-
-    rol(Persona,Rol),
+%bandoContrario(Contrincante,RolPersona)
+bandoContrario(Contrincante,mafia) :-
+    rol(Contrincante,Rol),
     Rol\=mafia.
 
-bandoContrario(Persona,Rol) :-
+bandoContrario(Contrincante,Rol) :-
     Rol\= mafia,
-    rol(Persona,mafia).
+    rol(Contrincante,mafia).
 
 % PARTE B
    gano(Persona) :-
@@ -126,9 +126,10 @@ test(jugador_que_perdio_antes_no_sigue_jugando,fail) :-
     siguenEnJuego(nick,4).
 test(jugadores_que_llegan_a_la_ultima_ronda,set(Jugadores==[maggie,burns])) :- 
     siguenEnJuego(Jugadores,6).
-%Todas las personas en juego juegan la primera ronda.
+%Todas las personas en juego juegan la primera ronda.     poner todos asi??
+test(todos_los_jugadores_juegan_la_primer_ronda,set(Jugadores==[maggie,burns,homero,bart,tony,nick,hibbert,lisa,rafa])) :- 
+    siguenEnJuego(Jugadores,1).
 :- end_tests(jugadores_siguen_en_juego).
-
 
 % PARTE B
 % Una ronda es interesante si en dicha ronda siguen más de 7 personas en juego.
