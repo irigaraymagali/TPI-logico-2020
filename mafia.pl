@@ -53,7 +53,9 @@ perdieronLaRonda(Persona,Ronda) :-
     ronda(Ronda,atacarPersona(Persona)),
     not(ronda(Ronda,salvarPersona(_,Persona))).
 
-% Explicar qué conceptos permiten resolver este requerimiento sin la necesidad de armar listas.
+% Los conceptos que permiten resolver este requerimiento sin la necesidad de armar listas,
+% son inversibilidad ya que nos permite hacer consultas existenciales ademas de functores, que nos permite 
+% agrupar informacion relacionada como las personas involucradas en las direfentes acciones de las rondas.
 
 % Caso de prueba
 :- begin_tests(perdieron_la_ronda).
@@ -94,8 +96,13 @@ bandoContrario(Contrincante,Rol) :-
     not(perdieronLaRonda(Persona,_)),
     forall(contrincantes(Persona,Contrincante),perdieronLaRonda(Contrincante,_)).
 
-% Explicar cómo se relaciona el concepto de inversibilidad con la solución.    
-%
+% El predicado "gano" es inversible ya que admite consultas existenciales, es decir con variables libres para sus argumentos.
+%     ?- gano(_).
+%        true 
+%     ?- gano(Persona).
+%        Persona = maggie ;
+%        false.
+   
 
 % Caso de prueba
 :- begin_tests(jugadores_contrincantes).
@@ -190,7 +197,7 @@ accionResponsable(Persona,salvarPersona) :-
     ronda(_,salvarPersona(_,Persona)).
 accionResponsable(Persona,investigarPersona) :-
     rol(Persona,detective),
-    ronda(_,investigarPersona(Persona,_)).
+    ronda(_,investigarPersona(Persona,_)). 
 accionResponsable(Persona,eliminarPersona) :-
     ronda(_,eliminarPersona(PersonaEliminada)),
     contrincantes(PersonaEliminada,Persona).
@@ -213,3 +220,7 @@ test(jugadores_profesionales,set(Jugadores==[bart,tony,maggie,lisa,rafa])) :-
 
 % PARTE B
 
+% Encontrar una “estrategia” que se haya desenvuelto en la partida.
+% estrategia: serie de acciones que se desarrollan a lo largo de la partida
+% una acción por cada ronda de la partida, en orden:  [accion ronda1, accion ronda2, accion ronda3, accion ronda3, ...]
+% encadenadas,la persona afectada por la acción anterior es la responsable de la siguiente.
