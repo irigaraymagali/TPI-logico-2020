@@ -146,15 +146,18 @@ rondaInteresante(Ronda) :-
 
 rondaInteresante(Ronda) :-
     ronda(Ronda,_),
-    cantidadPersonasQueSiguen(Ronda,Cantidad),
-    findall(Persona,rol(Persona,mafia),Mafiosos),
-    length(Mafiosos, CantidadInicialMafia),
-    Cantidad =< CantidadInicialMafia.
+    cantidadPersonasQueSiguen(Ronda,CantidadPersonas),
+    cantidadMafiososInicial(_,CantidadInicialMafia),
+    CantidadPersonas =< CantidadInicialMafia.
 
-cantidadPersonasQueSiguen(Ronda,Cantidad) :-
+cantidadPersonasQueSiguen(Ronda,CantidadPersonas) :-
     findall(Persona,siguenEnJuego(Persona,Ronda), PersonasQueSiguen),
-    length(PersonasQueSiguen, Cantidad).
-    
+    length(PersonasQueSiguen, CantidadPersonas).
+
+cantidadMafiososInicial(Persona,CantidadInicialMafia) :-
+    findall(Persona,rol(Persona,mafia),Mafiosos),
+    length(Mafiosos, CantidadInicialMafia).
+
 % Caso de prueba.
 :- begin_tests(rondas_interesantes).
 test(ronda_con_mucha_gente_es_interesante,nondet) :- 
@@ -165,12 +168,20 @@ test(todas_las_rondas_interesantes,set(Rondas==[1,2,6])) :-
     rondaInteresante(Rondas).
 :- end_tests(rondas_interesantes).
 
+
+
+
+
+
+
 % PUNTO 5
 
 % PARTE A 
 jugadorProfesional(Persona) :- 
-contrincantes(Persona,Contrincante),
-forall(accionResponsable(Persona,Accion), accionAfectada(Contrincante,Accion)).
+    rol(Persona,_),
+    rol(Contrincante,_),
+    contrincantes(Persona,Contrincante),
+    forall(accionResponsable(Persona,Accion), accionAfectada(Contrincante,Accion)).
 
 accionResponsable(Persona,atacarPersona) :-
      rol(Persona,mafia).
@@ -192,6 +203,9 @@ accionAfectada(Persona,investigarPersona) :-
     ronda(_,investigarPersona(_,Persona)).
 accionAfectada(Persona,eliminarPersona) :-
     ronda(_,eliminaroPersona(Persona)).
+
+
+
 
 
 
