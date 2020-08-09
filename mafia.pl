@@ -181,7 +181,7 @@ jugadorProfesional(Persona) :-
     rol(Persona,_),
     rol(Contrincante,_),
     contrincantes(Persona,Contrincante),
-    forall(accionResponsable(Persona,Accion), accionAfectada(Contrincante,Accion)).
+    forall(accionAfectada(Contrincante,Accion),accionResponsable(Persona,Accion)).
 
 accionResponsable(Persona,atacarPersona) :-
      rol(Persona,mafia).
@@ -204,11 +204,12 @@ accionAfectada(Persona,investigarPersona) :-
 accionAfectada(Persona,eliminarPersona) :-
     ronda(_,eliminaroPersona(Persona)).
 
+% Caso de prueba.
+:- begin_tests(jugador_profesional).
+test(jugadores_profesionales,set(Jugadores==[bart,tony,maggie,lisa,rafa])) :- 
+    jugadorProfesional(Jugadores).
+:- end_tests(jugador_profesional).
 
 
-
-
-
-
-
+% PARTE B
 
