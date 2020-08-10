@@ -118,7 +118,17 @@ test(maggie_es_la_unica_ganadora,nondet) :-
     gano(maggie).
 :- end_tests(jugadores_ganadores).
 
+% Punto 3
+% Parte A
 
+esImbatible(Medico):-
+    rol(Medico, medico),
+    ronda(Ronda, atacarUnaPersona(PersonaAtacada)),
+    ronda(Ronda, salvarUnaPersona(PersonaAtacada, Medico)).
+
+esImbatible(Detective):-
+    rol(Detective, detective),
+    forall(rol(Persona, mafia), ronda(_, investigarUnaPersona(Persona, Detective))).
 
 
 % PUNTO 4
@@ -176,10 +186,28 @@ test(todas_las_rondas_interesantes,set(Rondas==[1,2,6])) :-
     rondaInteresante(Rondas).
 :- end_tests(rondas_interesantes).
 
+% Parte C
 
+vivieronElPeligro(Persona):-
+    jugoRondaPeligrosa(Persona, Cantidad).
 
+jugoRondaPeligrosa(Persona, NumeroDeRonda):-
+    siguenEnJuego(Persona, NumeroDeRonda),
+    cantidadNoCiviles(CantidadNoCiviles, NumeroDeRonda),
+    cantidadDeCiviles(CantidadCiviles),
+    CantidadNoCiviles is CantidadCiviles * 3.
 
+cantidadNoCiviles(CantidadNoCiviles, NumeroDeRonda):-
+  findall(Persona, (siguenEnJuego(Persona, NumeroDeRonda), noEsCivil(Persona)), PersonasNoCiviles),
+  length(PersonasNoCiviles, CantidadNoCiviles).
+  
+cantidadDeCiviles(CantidadCiviles):-
+    findall(Persona, (siguenEnJuego(Persona, 1), rol(Persona, civil)), Civiles),
+    length(Civiles, CantidadCiviles).
 
+noEsCivil(Persona):-
+    rol(Persona, Rol),
+    Rol\=civil.
 
 
 % PUNTO 5
