@@ -54,7 +54,8 @@ perdieronLaRonda(Persona,Ronda) :-
     not(ronda(Ronda,salvarPersona(_,Persona))).
 
 % Los conceptos que permiten resolver este requerimiento sin la necesidad de armar listas,
-% son inversibilidad ya que nos permite hacer consultas existenciales ademas de functores, que nos permite 
+% son pattern matching ya que se buscan todos los individuos que satisfacen un predicado, 
+% inversibilidad ya que nos permite hacer consultas existenciales ademas de functores, que nos permite 
 % agrupar informacion relacionada como las personas involucradas en las direfentes acciones de las rondas.
 
 % Caso de prueba
