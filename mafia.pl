@@ -79,17 +79,18 @@ test(jugadores_que_pierden_la_ronda,set(Persona==[bart,lisa])) :-
 
 % PARTE A
 contrincantes(Persona,Contrincante) :-
-    rol(Persona,Rol),
-    bandoContrario(Contrincante,Rol).
+    rol(Persona,RolPersona),
+    bandoContrario(Contrincante,RolPersona).
     
 %bandoContrario(Contrincante,RolPersona)
 bandoContrario(Contrincante,mafia) :-
-    rol(Contrincante,Rol),
-    Rol\=mafia.
+    rol(Contrincante,RolContrincante),
+    RolContrincante\=mafia.
 
-bandoContrario(Contrincante,Rol) :-
-    Rol\= mafia,
+bandoContrario(Contrincante,RolPersona) :-
+    RolPersona\= mafia,
     rol(Contrincante,mafia).
+
 
 % PARTE B
    gano(Persona) :-
@@ -98,6 +99,7 @@ bandoContrario(Contrincante,Rol) :-
     forall(contrincantes(Persona,Contrincante),perdieronLaRonda(Contrincante,_)).
 
 % El predicado "gano" es inversible ya que admite consultas existenciales, es decir con variables libres para sus argumentos.
+% Porque la persona esta ligada.
 %     ?- gano(_).
 %        true 
 %     ?- gano(Persona).
@@ -118,7 +120,17 @@ test(maggie_es_la_unica_ganadora,nondet) :-
     gano(maggie).
 :- end_tests(jugadores_ganadores).
 
+% Punto 3
+% Parte A
 
+esImbatible(Medico):-
+    rol(Medico, medico),
+    ronda(Ronda, atacarUnaPersona(PersonaAtacada)),
+    ronda(Ronda, salvarUnaPersona(PersonaAtacada, Medico)).
+
+esImbatible(Detective):-
+    rol(Detective, detective),
+    forall(rol(Persona, mafia), ronda(_, investigarUnaPersona(Persona, Detective))).
 
 
 % PUNTO 4
@@ -176,10 +188,28 @@ test(todas_las_rondas_interesantes,set(Rondas==[1,2,6])) :-
     rondaInteresante(Rondas).
 :- end_tests(rondas_interesantes).
 
+% Parte C
 
+vivieronElPeligro(Persona):-
+    jugoRondaPeligrosa(Persona, Cantidad).
 
+jugoRondaPeligrosa(Persona, NumeroDeRonda):-
+    siguenEnJuego(Persona, NumeroDeRonda),
+    cantidadNoCiviles(CantidadNoCiviles, NumeroDeRonda),
+    cantidadDeCiviles(CantidadCiviles),
+    CantidadNoCiviles is CantidadCiviles * 3.
 
+cantidadNoCiviles(CantidadNoCiviles, NumeroDeRonda):-
+  findall(Persona, (siguenEnJuego(Persona, NumeroDeRonda), noEsCivil(Persona)), PersonasNoCiviles),
+  length(PersonasNoCiviles, CantidadNoCiviles).
+  
+cantidadDeCiviles(CantidadCiviles):-
+    findall(Persona, (siguenEnJuego(Persona, 1), rol(Persona, civil)), Civiles),
+    length(Civiles, CantidadCiviles).
 
+noEsCivil(Persona):-
+    rol(Persona, Rol),
+    Rol\=civil.
 
 
 % PUNTO 5
@@ -187,29 +217,28 @@ test(todas_las_rondas_interesantes,set(Rondas==[1,2,6])) :-
 % PARTE A 
 jugadorProfesional(Persona) :- 
     rol(Persona,_),
-    rol(Contrincante,_),
     contrincantes(Persona,Contrincante),
     forall(accionAfectada(Contrincante,Accion),accionResponsable(Persona,Accion)).
 
-accionResponsable(Persona,atacarPersona) :-
+accionResponsable(Persona,atacarPersona(_)) :-
      rol(Persona,mafia).
-accionResponsable(Persona,salvarPersona) :-
+accionResponsable(Persona,salvarPersona(_,Persona)) :-
     rol(Persona,medico),
     ronda(_,salvarPersona(_,Persona)).
-accionResponsable(Persona,investigarPersona) :-
+accionResponsable(Persona,investigarPersona(Persona,_)) :-
     rol(Persona,detective),
     ronda(_,investigarPersona(Persona,_)). 
-accionResponsable(Persona,eliminarPersona) :-
+accionResponsable(Persona,eliminarPersona(PersonaEliminada)) :-
     ronda(_,eliminarPersona(PersonaEliminada)),
     contrincantes(PersonaEliminada,Persona).
 
-accionAfectada(Persona,atacarPersona) :-
+accionAfectada(Persona,atacarPersona(Persona)) :-
     ronda(_,atacarPersona(Persona)).
-accionAfectada(Persona,salvarPersona) :-
+accionAfectada(Persona,salvarPersona(_,Persona)) :-
     ronda(_,salvarPersona(_,Persona)).
-accionAfectada(Persona,investigarPersona) :-
+accionAfectada(Persona,investigarPersona(_,Persona)) :-
     ronda(_,investigarPersona(_,Persona)).
-accionAfectada(Persona,eliminarPersona) :-
+accionAfectada(Persona,eliminarPersona(Persona)) :-
     ronda(_,eliminaroPersona(Persona)).
 
 % Caso de prueba.
@@ -221,7 +250,50 @@ test(jugadores_profesionales,set(Jugadores==[bart,tony,maggie,lisa,rafa])) :-
 
 % PARTE B
 
-% Encontrar una “estrategia” que se haya desenvuelto en la partida.
-% estrategia: serie de acciones que se desarrollan a lo largo de la partida
-% una acción por cada ronda de la partida, en orden:  [accion ronda1, accion ronda2, accion ronda3, accion ronda3, ...]
+% Encontrar una estrategia que se haya desenvuelto en la partida.
+% estrategia: serie de acciones que se desarrollan a lo largo de la partida  (las acciones son functores)
+estrategiaDesenvuelta(ListaAcciones) :-         %ListaDeAcciones = Estrategia
+    estategiaOrdenada(ListaAcciones),
+    estrategiaEncadenada(ListaAccciones,_,_),
+    estrategiaSinRepetir(ListaAcciones).
+
 % encadenadas,la persona afectada por la acción anterior es la responsable de la siguiente.
+% Caso base   (corta en la ronda 6 porque es la ultima ronda)
+estrategiaEncadenada(ListaDeAcciones,6,_) :-
+    nth1(6,ListaDeAcciones,Accion),
+    ronda(6,Accion).
+
+% Caso recursivo
+estrategiaEncadenada(ListaDeAcciones,Ronda,PersonaResponsable) :-
+    nth1(Ronda,ListaDeAcciones,Accion),
+    ronda(Ronda,Accion),
+    RondaSiguiente is Ronda + 1,
+    accionAfectada(PersonaAtacada,Accion),
+    estrategiaEncadenada(ListaDeAcciones,RondaSiguiente,PersonaAtacada).
+
+% una acción por cada ronda de la partida, en orden:[accion ronda1, accion ronda2, accion ronda3, accion ronda3, ...]
+estategiaOrdenada([Accion1,Accion2,Accion3,Accion4,Accion5,Accion6]):-
+    ronda(1,Accion1),
+    ronda(2,Accion2),
+    ronda(3,Accion3),
+    ronda(4,Accion4),
+    ronda(5,Accion5),
+    ronda(6,Accion6).
+
+estrategiaSinRepetir(ListaAcciones) :-
+    list_to_set(ListaAcciones,ConjuntoSinRepetir),
+    ListaAcciones is ConjuntoSinRepetir.
+
+
+% Caso de prueba.
+:- begin_tests(estrategia_desenvuelta).
+test(estrategia_desenvuelta,nondet) :- 
+    estrategiaDesenvuelta([atacarPersona(lisa),investigarPersona(lisa,bart),atacarPersona(lisa),investigarPersona(lisa,homero),eliminarPersona(bart),atacarPersona(burns)]).
+:- end_tests(estrategia_desenvuelta).
+
+% 1)La mafia ataca a Lisa.
+% 2)Lisa investiga a Bart.
+% 3)La mafia vuelve a atacar a Lisa.
+% 4)Lisa investiga a Homero.
+% 5)Bart es eliminado. 
+% 6)La mafia ataca a Burns. 
