@@ -9,7 +9,7 @@ rol(hibbert, medico).
 rol(lisa, detective).
 rol(rafa, detective).
 
-% Acciones:
+% Acciones: 
 % atacarPersona(persona atacada).
 % salvarPersona(medico, persona salvada).
 % investigarPersona(detective, persona).
@@ -122,6 +122,12 @@ test(maggie_es_la_unica_ganadora,nondet) :-
 
 % Punto 3
 % Parte A
+
+esImbatible(Medico):-
+    rol(Medico, medico),
+    ronda(Ronda, atacarUnaPersona(PersonaAtacada)),
+    ronda(Ronda, salvarUnaPersona(PersonaAtacada, Medico)).
+
 
 esImbatible(Medico):-
     rol(Medico, medico),
