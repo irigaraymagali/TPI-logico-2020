@@ -259,13 +259,13 @@ test(jugadores_profesionales,set(Jugadores==[bart,tony,maggie,lisa,rafa])) :-
 
 % estrategia: serie de acciones que se desarrollan a lo largo de la partida  (las acciones son functores)
 estrategiaDesenvuelta(ListaAcciones) :-         %ListaDeAcciones = Estrategia
-    estategiaOrdenada(ListaAcciones),
     estrategiaEncadenada(ListaAcciones,_,_),
     estrategiaSinRepetir(ListaAcciones).
 
 % encadenadas,la persona afectada por la acción anterior es la responsable de la siguiente.
 
 % lista = [Cabeza|Cola]
+
 % estrategiaEncadenada([Cabeza|Cola],Persona) :-
 % accionAfectada(Persona,Cabeza),
 % nth1(1,Cola,AccionSiguiente),
@@ -273,6 +273,8 @@ estrategiaDesenvuelta(ListaAcciones) :-         %ListaDeAcciones = Estrategia
 % accionAfectada(PAfc,AccionSiguiente),
 % estrategiaEncadenada([Cabeza|Cola],PAfc).
     
+
+
 
 % Caso base   (corta en la ronda 6 porque es la ultima ronda)
 estrategiaEncadenada(ListaDeAcciones,6,_) :-
@@ -289,13 +291,7 @@ estrategiaEncadenada(ListaDeAcciones,Ronda,_) :-
     estrategiaEncadenada(ListaDeAcciones,RondaSiguiente,PersonaAtacada).
 
 % una acción por cada ronda de la partida, en orden:[accion ronda1, accion ronda2, accion ronda3, accion ronda3, ...]
-estategiaOrdenada([Accion1,Accion2,Accion3,Accion4,Accion5,Accion6]):-
-    ronda(1,Accion1),
-    ronda(2,Accion2),
-    ronda(3,Accion3),
-    ronda(4,Accion4),
-    ronda(5,Accion5),
-    ronda(6,Accion6).
+% estategiaOrdenada([Accion1,Accion2,Accion3,Accion4,Accion5,Accion6]):-
 
 estrategiaSinRepetir(ListaAcciones) :-
     list_to_set(ListaAcciones,ConjuntoSinRepetir),
