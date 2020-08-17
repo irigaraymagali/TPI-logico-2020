@@ -79,18 +79,18 @@ test(jugadores_que_pierden_la_ronda,set(Persona==[bart,lisa])) :-
 
 % PARTE A
 contrincantes(Persona,Contrincante) :-
+        bandoContrario(Persona,Contrincante).
+        
+bandoContrario(Persona,Contrincante) :-
     rol(Persona,RolPersona),
-    bandoContrario(Contrincante,RolPersona).
-    
-%bandoContrario(Contrincante,RolPersona)
-bandoContrario(Contrincante,mafia) :-
     rol(Contrincante,RolContrincante),
-    RolContrincante\=mafia.
+    contrario(RolPersona,RolContrincante).
 
-bandoContrario(Contrincante,RolPersona) :-
-    RolPersona\= mafia,
-    rol(Contrincante,mafia).
+contrario(mafia,RolContrincante):-
+    RolContrincante \= mafia.
 
+contrario(RolPersona,mafia) :-
+    RolPersona \= mafia.
 
 % PARTE B
    gano(Persona) :-
@@ -255,23 +255,34 @@ test(jugadores_profesionales,set(Jugadores==[bart,tony,maggie,lisa,rafa])) :-
 
 
 % PARTE B
-
 % Encontrar una estrategia que se haya desenvuelto en la partida.
+
 % estrategia: serie de acciones que se desarrollan a lo largo de la partida  (las acciones son functores)
 estrategiaDesenvuelta(ListaAcciones) :-         %ListaDeAcciones = Estrategia
     estategiaOrdenada(ListaAcciones),
-    estrategiaEncadenada(ListaAccciones,_,_),
+    estrategiaEncadenada(ListaAcciones,_,_),
     estrategiaSinRepetir(ListaAcciones).
 
 % encadenadas,la persona afectada por la acción anterior es la responsable de la siguiente.
+
+% lista = [Cabeza|Cola]
+% estrategiaEncadenada([Cabeza|Cola],Persona) :-
+% accionAfectada(Persona,Cabeza),
+% nth1(1,Cola,AccionSiguiente),
+% accionResponsable(Persona,AccionSiguiente),
+% accionAfectada(PAfc,AccionSiguiente),
+% estrategiaEncadenada([Cabeza|Cola],PAfc).
+    
+
 % Caso base   (corta en la ronda 6 porque es la ultima ronda)
 estrategiaEncadenada(ListaDeAcciones,6,_) :-
     nth1(6,ListaDeAcciones,Accion),
     ronda(6,Accion).
 
 % Caso recursivo
-estrategiaEncadenada(ListaDeAcciones,Ronda,PersonaResponsable) :-
-    nth1(Ronda,ListaDeAcciones,Accion),
+%estrategiaEncadenada(estrategia,ronda,personaResponsable)
+estrategiaEncadenada(ListaDeAcciones,Ronda,_) :-
+    nth1(Ronda,ListaDeAcciones,Accion),        %la ronda seria la posicion, para que en la pos1 haya una ccion de la ronda 1, etc
     ronda(Ronda,Accion),
     RondaSiguiente is Ronda + 1,
     accionAfectada(PersonaAtacada,Accion),
