@@ -254,48 +254,42 @@ test(jugadores_profesionales,set(Jugadores==[bart,tony,maggie,lisa,rafa])) :-
 :- end_tests(jugador_profesional).
 
 
-% PARTE B
-% Encontrar una estrategia que se haya desenvuelto en la partida.
+% PARTE B  
+estrategiaDesenvuelta(Estrategia) :-         % Estrategia = ListaDeAcciones   (las acciones son functores)
+    estrategiaEncadenada(Estrategia ,_),
+    % estrategiaSinRepetir(Estrategia),
+    estrategiaOrdenada(Estrategia).
 
-% estrategia: serie de acciones que se desarrollan a lo largo de la partida  (las acciones son functores)
-estrategiaDesenvuelta(ListaAcciones) :-         %ListaDeAcciones = Estrategia
-    estrategiaEncadenada(ListaAcciones,_,_),
-    estrategiaSinRepetir(ListaAcciones).
-
-% encadenadas,la persona afectada por la acción anterior es la responsable de la siguiente.
-
-% lista = [Cabeza|Cola]
-
-% estrategiaEncadenada([Cabeza|Cola],Persona) :-
-% accionAfectada(Persona,Cabeza),
-% nth1(1,Cola,AccionSiguiente),
-% accionResponsable(Persona,AccionSiguiente),
-% accionAfectada(PAfc,AccionSiguiente),
-% estrategiaEncadenada([Cabeza|Cola],PAfc).
+%la persona afectada por la acción anterior es la responsable de la siguiente.
+estrategiaEncadenada([AccionRonda1,AccionRonda2|AccionesRondasSiguientes],Persona) :-      % lista = [Cabeza|Cola]
+accionAfectada(Persona,AccionRonda1),
+accionResponsable(Persona,AccionRonda2),
+estrategiaEncadenada([AccionRonda2|AccionesRondasSiguientes],Persona).
     
-
-
-
-% Caso base   (corta en la ronda 6 porque es la ultima ronda)
-estrategiaEncadenada(ListaDeAcciones,6,_) :-
-    nth1(6,ListaDeAcciones,Accion),
-    ronda(6,Accion).
-
-% Caso recursivo
-%estrategiaEncadenada(estrategia,ronda,personaResponsable)
-estrategiaEncadenada(ListaDeAcciones,Ronda,_) :-
-    nth1(Ronda,ListaDeAcciones,Accion),        %la ronda seria la posicion, para que en la pos1 haya una ccion de la ronda 1, etc
-    ronda(Ronda,Accion),
-    RondaSiguiente is Ronda + 1,
-    accionAfectada(PersonaAtacada,Accion),
-    estrategiaEncadenada(ListaDeAcciones,RondaSiguiente,PersonaAtacada).
+estrategiaEncadenada([AccionRonda6|[] ],Persona) :-
+    accionAfectada(Persona,AccionRonda6).     
 
 % una acción por cada ronda de la partida, en orden:[accion ronda1, accion ronda2, accion ronda3, accion ronda3, ...]
-% estategiaOrdenada([Accion1,Accion2,Accion3,Accion4,Accion5,Accion6]):-
+estrategiaOrdenada([Accion1,Accion2,Accion3,Accion4,Accion5,Accion6]):-
+    ronda(1,Accion1),
+    ronda(2,Accion2),
+    ronda(3,Accion3),
+    ronda(4,Accion4),
+    ronda(5,Accion5),
+    ronda(6,Accion6).
 
-estrategiaSinRepetir(ListaAcciones) :-
-    list_to_set(ListaAcciones,ConjuntoSinRepetir),
-    ListaAcciones is ConjuntoSinRepetir.
+% estrategiaOrdenada(Accion1|AccionesSiguientes,Ronda1) :-
+%     ronda(Ronda1,Accion1),
+%     RondaSiguiente is Ronda1 + 1,
+%     estrategiaOrdenada(AccionesSiguientes,RondaSiguiente).
+
+% estrategiaOrdenada(AccionesSiguientes,6):-
+%     nth1(6,AccionesSiguientes,Accion6),
+%     ronda(6,Accion6).
+
+% estrategiaSinRepetir(Estrategia) :-
+%     list_to_set(Estrategia,ConjuntoSinRepetir),
+%     Estrategia is ConjuntoSinRepetir.
 
 
 % Caso de prueba.
