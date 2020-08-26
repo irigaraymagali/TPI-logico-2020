@@ -197,7 +197,7 @@ test(todas_las_rondas_interesantes,set(Rondas==[1,2,6])) :-
 % Parte C
 
 vivieronElPeligro(Persona):-
-    jugoRondaPeligrosa(Persona, Cantidad).
+    jugoRondaPeligrosa(Persona,_).
 
 jugoRondaPeligrosa(Persona, NumeroDeRonda):-
     siguenEnJuego(Persona, NumeroDeRonda),
@@ -255,42 +255,19 @@ test(jugadores_profesionales,set(Jugadores==[bart,tony,maggie,lisa,rafa])) :-
 
 
 % PARTE B  
-estrategiaDesenvuelta(Estrategia) :-         % Estrategia = ListaDeAcciones   (las acciones son functores)
-    estrategiaEncadenada(Estrategia ,_),
-    % estrategiaSinRepetir(Estrategia),
-    estrategiaOrdenada(Estrategia).
+estrategiaDesenvuelta(Estrategia) :-         % Estrategia = ListaDeAcciones 
+    estrategiaEstaEncadenada(_,Estrategia ,_).
 
-%la persona afectada por la acción anterior es la responsable de la siguiente.
-estrategiaEncadenada([AccionRonda1,AccionRonda2|AccionesRondasSiguientes],Persona) :-      % lista = [Cabeza|Cola]
-accionAfectada(Persona,AccionRonda1),
-accionResponsable(Persona,AccionRonda2),
-estrategiaEncadenada([AccionRonda2|AccionesRondasSiguientes],Persona).
+% la persona afectada por la acción anterior es la responsable de la siguiente.
+estrategiaEstaEncadenada(Ronda,[AccionRonda1,AccionRonda2|AccionesRondasSiguientes],Persona) :-  
+    accionAfectada(Persona,AccionRonda1),
+    accionResponsable(Persona,AccionRonda2),
+    RondaSiguiente is Ronda +1,
+    estrategiaEstaEncadenada(RondaSiguiente,[AccionRonda2|AccionesRondasSiguientes],Persona).
     
-estrategiaEncadenada([AccionRonda6|[] ],Persona) :-
-    accionAfectada(Persona,AccionRonda6).     
-
-% una acción por cada ronda de la partida, en orden:[accion ronda1, accion ronda2, accion ronda3, accion ronda3, ...]
-estrategiaOrdenada([Accion1,Accion2,Accion3,Accion4,Accion5,Accion6]):-
-    ronda(1,Accion1),
-    ronda(2,Accion2),
-    ronda(3,Accion3),
-    ronda(4,Accion4),
-    ronda(5,Accion5),
-    ronda(6,Accion6).
-
-% estrategiaOrdenada(Accion1|AccionesSiguientes,Ronda1) :-
-%     ronda(Ronda1,Accion1),
-%     RondaSiguiente is Ronda1 + 1,
-%     estrategiaOrdenada(AccionesSiguientes,RondaSiguiente).
-
-% estrategiaOrdenada(AccionesSiguientes,6):-
-%     nth1(6,AccionesSiguientes,Accion6),
-%     ronda(6,Accion6).
-
-% estrategiaSinRepetir(Estrategia) :-
-%     list_to_set(Estrategia,ConjuntoSinRepetir),
-%     Estrategia is ConjuntoSinRepetir.
-
+estrategiaEstaEncadenada(6,[Accion],Persona) :-
+    ronda(6,Accion),
+    accionAfectada(Persona,Accion).     
 
 % Caso de prueba.
 :- begin_tests(estrategia_desenvuelta).
