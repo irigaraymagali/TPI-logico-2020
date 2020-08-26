@@ -228,9 +228,9 @@ jugadorProfesional(Persona) :-
 
 accionResponsable(Persona,atacarPersona(_)) :-
      rol(Persona,mafia).
-accionResponsable(Persona,salvarPersona(_,Persona)) :-
+accionResponsable(Persona,salvarPersona(Persona,_)) :-
     rol(Persona,medico),
-    ronda(_,salvarPersona(_,Persona)).
+    ronda(_,salvarPersona(Persona,_)).
 accionResponsable(Persona,investigarPersona(Persona,_)) :-
     rol(Persona,detective),
     ronda(_,investigarPersona(Persona,_)). 
@@ -256,7 +256,7 @@ test(jugadores_profesionales,set(Jugadores==[bart,tony,maggie,lisa,rafa])) :-
 
 % PARTE B  
 estrategiaDesenvuelta(Estrategia) :-         % Estrategia = ListaDeAcciones 
-    estrategiaEstaEncadenada(_,Estrategia ,_).
+    estrategiaEstaEncadenada(1,Estrategia,_).
 
 % la persona afectada por la acción anterior es la responsable de la siguiente.
 estrategiaEstaEncadenada(Ronda,[AccionRonda1,AccionRonda2|AccionesRondasSiguientes],Persona) :-  
@@ -264,7 +264,7 @@ estrategiaEstaEncadenada(Ronda,[AccionRonda1,AccionRonda2|AccionesRondasSiguient
     accionResponsable(Persona,AccionRonda2),
     RondaSiguiente is Ronda +1,
     estrategiaEstaEncadenada(RondaSiguiente,[AccionRonda2|AccionesRondasSiguientes],Persona).
-    
+
 estrategiaEstaEncadenada(6,[Accion],Persona) :-
     ronda(6,Accion),
     accionAfectada(Persona,Accion).     
