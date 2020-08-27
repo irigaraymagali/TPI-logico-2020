@@ -252,16 +252,16 @@ test(jugadores_profesionales,set(Jugadores==[bart,tony,maggie,lisa,rafa])) :-
 estrategiaDesenvuelta(Estrategia) :-         % Estrategia = ListaDeAcciones 
     estrategiaEstaEncadenada(1,Estrategia).
 
-% la persona afectada por la acción anterior es la responsable de la siguiente.
+% La persona afectada por la acción anterior es la responsable de la siguiente.
 estrategiaEstaEncadenada(Ronda,[AccionRonda1,AccionRonda2|AccionesRondasSiguientes]) :-  
     accionAfectada(Persona,AccionRonda1),
     accionResponsable(Persona,AccionRonda2),
     RondaSiguiente is Ronda +1,
     estrategiaEstaEncadenada(RondaSiguiente,[AccionRonda2|AccionesRondasSiguientes]).
 
-estrategiaEstaEncadenada(6,[Accion]) :-
-    ronda(6,Accion),
-    accionAfectada(Persona,Accion).     
+estrategiaEstaEncadenada(UltimaRonda,[AccionUltimaRonda]) :-
+    ronda(UltimaRonda,AccionUltimaRonda),
+    accionAfectada(_,AccionUltimaRonda).     
 
 % Caso de prueba.
 :- begin_tests(estrategia_desenvuelta).
