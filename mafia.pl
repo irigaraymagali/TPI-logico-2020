@@ -1,3 +1,4 @@
+
 % rol(Persona, Rol).
 rol(homero, civil).
 rol(burns, civil).
@@ -125,14 +126,7 @@ test(maggie_es_la_unica_ganadora,nondet) :-
 
 esImbatible(Medico):-
     rol(Medico, medico),
-    ronda(Ronda, atacarUnaPersona(PersonaAtacada)),
-    ronda(Ronda, salvarUnaPersona(PersonaAtacada, Medico)).
-
-
-esImbatible(Medico):-
-    rol(Medico, medico),
-    ronda(Ronda, atacarUnaPersona(PersonaAtacada)),
-    ronda(Ronda, salvarUnaPersona(PersonaAtacada, Medico)).
+    forall(ronda(Ronda, salvarUnaPersona(PersonaAtacada, Medico)),ronda(Ronda, atacarUnaPersona(PersonaAtacada))).
 
 esImbatible(Detective):-
     rol(Detective, detective),
